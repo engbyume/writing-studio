@@ -1,0 +1,14 @@
+# Local dependencies and build outputs
+web/node_modules/
+web/dist/
+.venv/
+__pycache__/
+*.py[cod]
+
+# Local configuration and secrets
+.env
+.env.*
+!.env.example
+
+# Operating system files
+.DS_Store
