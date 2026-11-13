@@ -50,6 +50,6 @@ The next product phase may be a native macOS utility. Any model feature must use
 
 ## License
 
-The repository is prepared for an open-source first release. The initial license is MIT. Making the repository private later will not revoke the rights already granted to public copies.
+The repository is published under the MIT license for the first open-source phase. Making it private later will not revoke the rights already granted to public copies.
 
 See [CONTRIBUTING.md](CONTRIBUTING.md) for local development guidance and [SECURITY.md](SECURITY.md) for reporting a security issue.
