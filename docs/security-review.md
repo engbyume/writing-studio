@@ -26,7 +26,7 @@ Scope: local React website, document import workers, dependencies, and repositor
 
 - `npm run build` passed after the final application changes.
 - `npm audit` reported zero vulnerabilities.
-- A working-tree scan found no matches for common GitHub token, AWS key, or private-key patterns. This was a focused pattern scan, not a complete secrets scanner.
+- Gitleaks 8.30.1 scanned the initial commit, covering about 235 KB, and found no leaks.
 - The production build contains no source map files.
 - In the Codex in-app Chromium browser, a synthetic DOCX imported successfully, a compressed DOCX expanding beyond 20 MiB was rejected, 3-word and 10-word continuations appeared, Tab inserted the full suggestion, and a rule-based rewrite preserved initial capitalization.
 - Safari loaded the workspace layout. DOCX import was not tested in Safari because its file chooser opened with recent user files; the chooser was closed without selecting a file.
@@ -40,7 +40,7 @@ Scope: local React website, document import workers, dependencies, and repositor
 | #11, #14, #27, #28, #30, #35 | In-memory document handling, text rendering, no persistence/network/logging APIs in the source. Browser Storage and Network panels were not checked at runtime. |
 | #31 | Client-only processing; there is no server authorization boundary. |
 | #66 | Read-only source review completed. |
-| #19, #29, #52 | Focused token-pattern scan found no matches and the build has no source maps. A general secrets scanner and committed-history scan remain open. |
+| #19, #29, #52 | Gitleaks found no leaks in the initial commit, and the build has no source maps. Re-scan after future commits and releases. |
 
 The other core checks were N/A for this architecture: #1, #2, #20, #21, #25, #40, #41, #42, #46, #70; #3, #4, #5, #15, #16, #17, #22, #23, #33, #34, #36, #39, #43, #47, #48, #49, #50, #57, #65, #67; #6, #7; #12, #13, #55, #56; #18, #24, #26, #45, #62; #38; #44; #51, #58, #59, #60, #61, #63, #64; and #68. These checks concern accounts, authentication, server routes, databases, external services, AI, CI/CD, hosted infrastructure, production telemetry, or filesystem execution paths that this prototype does not have.
 
