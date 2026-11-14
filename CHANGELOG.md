@@ -1,5 +1,9 @@
 # Changelog
 
+## 2026-11-14
+
+- Added a fingerprint and Keychain readback check before trusting the localhost certificate for Word add-in testing.
+
 ## 2026-11-13
 
 - Started the standalone, local-first Writing Studio project.
