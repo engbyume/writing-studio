@@ -1,7 +1,7 @@
 # Security review
 
 Review date: 2026-11-13
-Scope: local React website, document import workers, dependencies, and repository release controls.
+Scope: phase-one React website, document import workers, dependencies, and repository release controls. The current macOS and Word architecture is covered by the update at the end of this file.
 
 ## Assessment
 
@@ -64,3 +64,68 @@ The other conditional checks were N/A: #73, #74, #75; #76, #77, #78; #79; #80, #
 - Run a general secrets scan over the committed history and release files.
 - Keep GitHub private vulnerability reporting enabled. Add provenance if packaged artifacts are introduced.
 - Review CSP and other response headers when a hosting target exists.
+
+## Current macOS and Word integration update
+
+This addendum describes the current source tree after adding the native macOS app and Word task-pane add-in. It supersedes the website-only counts above for the current tree while preserving that earlier phase review.
+
+### Current assessment and controls
+
+- The macOS app packages the local web workspace in a nonpersistent WKWebView. Its static asset server binds to `127.0.0.1`, uses a fixed route map, accepts GET only, rejects unexpected host and origin values, and exposes no document-text endpoint.
+- The native file picker allowlists TXT, Markdown, DOCX, and PDF. It passes selected files to the in-memory web workspace and does not persist them.
+- Native Export TXT passes the current draft from the bundled main frame through a local WebKit message handler. `NSSavePanel` restricts output to plain text, and the app writes UTF-8 atomically only after Save. Cancel creates no file.
+- Native Accessibility suggestions are disabled by default. This build supports TextEdit only. It checks the app's Accessibility trust state, reads at most 512 UTF-16 units before the caret, rechecks the active app, text element, and selection before insertion, and does not use Input Monitoring. The permission has not been granted or tested.
+- The Word task pane loads the Office.js runtime from Microsoft's official `officeapis.public.onecdn.static.microsoft` CDN. The XML manifest requests `ReadWriteDocument`, which grants document-wide access while the add-in is active. Code limits reads to a single main-document paragraph, rejects paragraphs over 65,536 character positions, checks offset mapping, and rechecks the selection before an explicit Insert or Replace action.
+- Office.js is mutable remote code. Its exact deployed version is managed by Microsoft's CDN, and the Word Add-in requires that platform runtime. The task-pane CSP allows Microsoft Office host origins in `frame-ancestors`. Writing Studio does not send document text to a web service.
+- Word range APIs and native Accessibility APIs operate across host boundaries. Word read and write use separate Office.js sync calls, so the operation cannot be atomic. The app's AX insertion depends on the target application supporting a settable selected-text attribute.
+- The npm CycloneDX SBOM covers the 142 packages in `web/package-lock.json`. It does not include the Office.js CDN runtime or Apple's system frameworks.
+
+### Verification evidence and limits
+
+- Parent verification passed: web build, Word Add-in TypeScript build, Word Add-in Vite build, `npm audit` with zero findings, Swift build, app packaging, plist validation, and app/resource byte comparison.
+- Parent verification checked the native app UI, imported `synthetic-migration-source.txt`, produced the source-based five-word completion, and inserted it into the local draft. It returned the expected 10-word count.
+- Parent verification saved a synthetic four-word draft through the native Save panel and read back the exact UTF-8 content. Cancel created no file. The temporary test export was removed.
+- The loopback static server returned the bundled site and rejected POST, traversal, foreign Origin, and foreign Host requests. It serves no document-text endpoint.
+- Word Add-in logic passed a local mock for insert, replace, stale selection, changed selection, other Word stories, cross-paragraph selections, and mismatched offset-to-text mapping. It passed XML parsing and static manifest checks.
+- CUA verified that the packaged Mac app loads the workspace, imports the synthetic migration source, shows a source-backed five-word continuation, and inserts it into the draft. TextEdit Accessibility behavior remains unverified because permission was not granted.
+- The Word Add-in has not been sideloaded or exercised in Word. A local HTTPS certificate is not present in the usual development location. Certificate trust and Word `ReadWriteDocument` access remain action-time gates. Word caret-event delivery, Office.js initialization under the CSP, and live selection mapping remain unverified.
+- Keep a full-history Gitleaks scan and remote readback in the public update process.
+
+### Current core check coverage
+
+The current architecture has 26 applicable and 44 N/A core checks.
+
+| Checks | Current evidence and limit |
+| --- | --- |
+| #4, #9, #10, #21, #32, #37, #38, #50, #69 | Word selection races and permission, input validation, bounded file parsing, ZIP path checks, and host writes. Worker timeout is 15 seconds. Word host calls have no app timeout. Word insertion remains unverified. |
+| #8, #53, #54 | Lockfile integrity, build and audit checks pass. Office.js is a mutable Microsoft CDN runtime outside npm lockfile/SBOM. |
+| #11, #14, #27, #28, #30, #35 | Sources and drafts stay in memory until the user exports; browser storage, logging, and analytics are not used. User text renders as text. Browser Storage/Network inspection remains unverified. |
+| #16, #45, #62 | There is no public app endpoint. The native static server is loopback-only; the Word add-in preview uses HTTPS and a restrictive CSP with an Office host allowlist. Word embedding remains unverified. |
+| #19, #29, #52, #66 | Run Gitleaks against each current Git history and release tree before public updates, and review the final diff. Earlier Gitleaks and source-map results cover prior website commits only. |
+| #31 | The Word host and browser client are untrusted inputs; important decisions stay in code and do not rely on hidden UI state. |
+
+The other 44 core checks are N/A for this architecture: #1, #2, #20, #25, #40, #41, #42, #46, #70; #3, #5, #15, #17, #22, #23, #33, #34, #36, #39, #43, #47, #48, #49, #57, #65, #67; #6, #7, #18, #24, #26; #12, #13, #55, #56; #44; #51, #58, #59, #60, #61, #63, #64; and #68. These checks concern accounts, shared business services, cloud hosting, OAuth, payments, databases, logs, or production operations not present in this local-first prototype.
+
+### Current conditional check coverage
+
+The current architecture has 11 applicable and 12 N/A conditional checks.
+
+| Checks | Current evidence and limit |
+| --- | --- |
+| #71, #72 | The npm SBOM covers `web/package-lock.json` only. It excludes the mutable Office.js CDN runtime and Apple system frameworks. No signed or packaged app artifact is published, and no build provenance attestation exists. |
+| #74, #75 | Office.js is external platform code; the add-in makes no application data API calls. The user document stays in Word. |
+| #76, #77, #78 | The native app uses a nonpersistent WebKit store, no custom app links, and an opt-in Accessibility mode. Accessibility remains off and TextEdit-only. |
+| #82 | Documents are sensitive. They stay in memory until the user exports. The Mac Save panel writes UTF-8 plain text only after Save, and Cancel creates no file. Browser downloads are user-triggered. The Word add-in holds imported sources in task-pane memory. Runtime storage/network inspection remains open. |
+| #83, #84 | GitHub private vulnerability reporting is enabled. The repository owner handles reports. No production incident drill has run for this prototype. |
+| #89 | DOCX/PDF parsing processes untrusted input in a bounded Worker. The native AX helper uses memory-safe Swift and checks Word/editor state before insert. Malformed archive cases and live Word/AX behavior remain untested. |
+
+The other 12 conditional checks are N/A: #73 no product API; #79 no game; #80 and #81 no model or RAG; #85 no critical persistent data; #86 no cloud workload; #87 and #88 no authenticated administrator or user account; #90 no proxy; #91 no container; #92 no queue; and #93 no hosted origin.
+
+### Before public promotion or hosted release
+
+- Run Gitleaks against current Git history and the final release tree, then verify remote readback.
+- Complete the action-time Word add-in sideload and certificate trust, then test the Word UI using only synthetic content.
+- Keep the Office.js CDN runtime and its document-wide host permission documented. The Office.js runtime is not included in the npm SBOM.
+- Grant Accessibility only if the user chooses to test TextEdit support. Do not enable Input Monitoring.
+- Test malformed DOCX variants and browser Storage/Network behavior before recommending sensitive documents.
+- Add signing, notarization, and provenance if a distributable app binary is released. Review HTTP response headers if a hosted service is added.

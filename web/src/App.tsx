@@ -1,14 +1,21 @@
-import { useRef, useState, useMemo } from "react"
+import { useRef, useState, useMemo, useEffect } from "react"
 import { BookOpen, FileText, Plus, Download, X, ArrowRight, PanelLeft, ShieldCheck, PanelBottom } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs"
 
-import { continuation, type Source } from "@/lib/completion"
+import { continuation, type Match, type Source } from "@/lib/completion"
 import { readSource } from "@/lib/parse-source"
 import { applyRule, rules } from "@/lib/rewrite"
 const MAX_SOURCES = 10
 const MAX_INPUT_TOTAL = 50 * 1024 * 1024
 const MAX_TEXT_TOTAL = 5 * 1024 * 1024
+
+declare global {
+  interface Window {
+    writingStudioSuggest?: (before: string, length?: number) => Match | null
+  }
+}
+
 function App() {
   const [sources, setSources] = useState<Source[]>([])
   const [draft, setDraft] = useState("")
@@ -24,6 +31,13 @@ function App() {
   const editor = useRef<HTMLTextAreaElement>(null)
   const upload = useRef<HTMLInputElement>(null)
   const sheetToggle = useRef<HTMLButtonElement>(null)
+  useEffect(() => {
+    window.writingStudioSuggest = (before, requestedLength) => {
+      const targetLength = Math.max(3, Math.min(10, requestedLength ?? length))
+      return continuation(before, sources, targetLength)
+    }
+    return () => { delete window.writingStudioSuggest }
+  }, [sources, length])
   const suggestion = useMemo(() => selection.start === selection.end && !dismissed ? continuation(draft.slice(0, selection.start), sources, length) : null, [draft, sources, length, selection, dismissed])
   const selected = draft.slice(selection.start, selection.end)
   const alternatives = useMemo(() => {
@@ -76,6 +90,13 @@ function App() {
     requestAnimationFrame(() => { editor.current?.focus(); editor.current?.setSelectionRange(position, position) })
   }
   function exportDraft() {
+    const bridge = (window as Window & {
+      webkit?: { messageHandlers?: { exportDraft?: { postMessage(message: string): void } } }
+    }).webkit?.messageHandlers?.exportDraft
+    if (bridge) {
+      bridge.postMessage(draft)
+      return
+    }
     const url = URL.createObjectURL(new Blob([draft], { type: "text/plain;charset=utf-8" }))
     const link = document.createElement("a"); link.href = url; link.download = "untitled-essay.txt"; link.click()
     setTimeout(() => URL.revokeObjectURL(url), 1000)

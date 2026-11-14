@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<OfficeApp xmlns="http://schemas.microsoft.com/office/appforoffice/1.1"
+           xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+           xsi:type="TaskPaneApp">
+  <Id>a965ad63-fb76-4739-8dc3-36192c891619</Id>
+  <Version>1.0.0.0</Version>
+  <ProviderName>Writing Studio</ProviderName>
+  <DefaultLocale>en-US</DefaultLocale>
+  <DisplayName DefaultValue="Writing Studio"/>
+  <Description DefaultValue="Use your sources for next-word suggestions and rewrite selected text in Word."/>
+  <SupportUrl DefaultValue="https://localhost:3001/"/>
+  <Hosts>
+    <Host Name="Document"/>
+  </Hosts>
+  <DefaultSettings>
+    <SourceLocation DefaultValue="https://localhost:3001/"/>
+  </DefaultSettings>
+  <Permissions>ReadWriteDocument</Permissions>
+</OfficeApp>

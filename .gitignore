@@ -10,5 +10,10 @@ __pycache__/
 .env.*
 !.env.example
 
+# Local Word add-in development certificates and keys
+web/word-addin/certs/
+web/word-addin/*.pem
+web/word-addin/*.key
+
 # Operating system files
 .DS_Store

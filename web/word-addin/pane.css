@@ -1,0 +1,117 @@
+@import "tailwindcss";
+@source "../src/components/ui/button.tsx";
+
+@theme {
+  --color-background: #fffefa;
+  --color-foreground: #283b33;
+  --color-primary: #88462f;
+  --color-primary-foreground: #fff;
+  --color-muted: #eaf0e8;
+  --color-border: #bdc8bf;
+  --color-ring: #965239;
+}
+
+:root {
+  background: #f8f7f2;
+  color: var(--color-foreground);
+  font: 14px/1.5 Arial, Helvetica, sans-serif;
+  font-synthesis: none;
+}
+
+.masthead {
+  display: flex;
+  gap: 11px;
+  align-items: center;
+  min-height: 56px;
+  padding: 12px 16px;
+  background: #193b30;
+  color: #f6f7ef;
+}
+
+.masthead h1 { font: 22px/1.1 Georgia, serif; }
+
+main {
+  display: grid;
+  max-width: 540px;
+  padding: 16px;
+  margin-inline: auto;
+  gap: 18px;
+}
+
+.section-heading {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+h2 { font: 21px/1.2 Georgia, serif; }
+h3 { font-size: 12px; font-weight: 700; }
+
+.muted { color: #526358; font-size: 12px; }
+.muted:not(:empty) { margin-top: 8px; }
+
+.empty, .card, .original {
+  padding: 12px;
+  margin-top: 10px;
+  border: 1px solid #d4ded2;
+  border-radius: 8px;
+  overflow-wrap: anywhere;
+}
+
+.empty, .card { background: #eef4ec; }
+.original { background: #fffefa; }
+.original p { margin-top: 4px; }
+.original p, .suggested { white-space: pre-wrap; }
+
+.suggested { font: 17px/1.45 Georgia, serif; }
+.card button { margin-top: 10px; }
+.attribution {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  margin-top: 8px;
+  color: #465e4e;
+  font-size: 12px;
+}
+.attribution svg, .sources svg, footer svg { flex: none; }
+
+.length {
+  display: grid;
+  grid-template-columns: 1fr auto;
+  gap: 6px 10px;
+  margin-top: 12px;
+  font-size: 12px;
+}
+.length input { grid-column: 1 / -1; width: 100%; accent-color: #36654e; }
+
+.library { border-top: 1px solid #d4ded2; padding-top: 12px; }
+.sources { margin-top: 8px; }
+.sources li {
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr) auto;
+  align-items: center;
+  gap: 6px;
+  min-height: 34px;
+  border-bottom: 1px solid #e0e6dc;
+  overflow-wrap: anywhere;
+}
+.errors {
+  margin-top: 8px;
+  padding-left: 18px;
+  list-style: disc;
+  font-size: 12px;
+  color: #7b3525;
+  overflow-wrap: anywhere;
+}
+
+footer {
+  display: flex;
+  align-items: flex-start;
+  gap: 6px;
+  color: #526358;
+  font-size: 12px;
+}
+
+:where(button, input):focus-visible { outline: 2px solid #965239; outline-offset: 2px; }
