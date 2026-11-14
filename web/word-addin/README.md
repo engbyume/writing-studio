@@ -25,9 +25,12 @@ Before changing Keychain trust, read the SHA-256 fingerprint and subject alterna
 
 ```sh
 openssl x509 -in "$WRITING_STUDIO_WORD_CERT" -noout -fingerprint -sha256 -ext subjectAltName
+openssl x509 -in "$WRITING_STUDIO_WORD_CERT" -outform DER | shasum -a 256
 openssl x509 -in "$WRITING_STUDIO_WORD_CERT" -pubkey -noout | openssl pkey -pubin -outform DER | shasum -a 256
 openssl pkey -in "$WRITING_STUDIO_WORD_KEY" -pubout -outform DER | shasum -a 256
 ```
+
+The OpenSSL fingerprint and DER hash must match. If they differ, stop and resolve the certificate source before requesting approval.
 
 After direct approval, trust the certificate for SSL on `localhost` in the login keychain, then verify that the same certificate passes hostname validation:
 

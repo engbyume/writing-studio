@@ -2,7 +2,7 @@
 
 ## 2026-11-14
 
-- Added a fingerprint and Keychain readback check before trusting the localhost certificate for Word add-in testing.
+- Added a fingerprint, DER hash, and Keychain readback check before trusting the localhost certificate for Word add-in testing.
 
 ## 2026-11-13
 
