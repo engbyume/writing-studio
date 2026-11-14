@@ -88,7 +88,7 @@ This addendum describes the current source tree after adding the native macOS ap
 - The loopback static server returned the bundled site and rejected POST, traversal, foreign Origin, and foreign Host requests. It serves no document-text endpoint.
 - Word Add-in logic passed a local mock for insert, replace, stale selection, changed selection, other Word stories, cross-paragraph selections, and mismatched offset-to-text mapping. It passed XML parsing and static manifest checks.
 - CUA verified that the packaged Mac app loads the workspace, imports the synthetic migration source, shows a source-backed five-word continuation, and inserts it into the draft. TextEdit Accessibility behavior remains unverified because permission was not granted.
-- The Word Add-in has not been sideloaded or exercised in Word. A local HTTPS certificate is not present in the usual development location. Certificate trust and Word `ReadWriteDocument` access remain action-time gates. Word caret-event delivery, Office.js initialization under the CSP, and live selection mapping remain unverified.
+- The Word Add-in has not been sideloaded or exercised in Word. Certificate trust and Word `ReadWriteDocument` access remain action-time gates. Word caret-event delivery, Office.js initialization under the CSP, and live selection mapping remain unverified.
 - Keep a full-history Gitleaks scan and remote readback in the public update process.
 
 ### Current core check coverage
