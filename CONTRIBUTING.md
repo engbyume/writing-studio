@@ -10,37 +10,19 @@ npm ci
 npm run dev
 ```
 
-Before submitting a change, run:
+From `web`, build the site, audit dependencies, and build the Word task pane:
 
 ```sh
 npm run build
 npm audit
-```
-
-Build the Word task pane from `web` with:
-
-```sh
 ./node_modules/.bin/tsc -p word-addin/tsconfig.json
 ./node_modules/.bin/vite build --config word-addin/vite.config.ts
 ```
 
-Build the native macOS app from the repository root after the web build with:
+From the repository root, package the native macOS app after the web build:
 
 ```sh
 ./macos/scripts/package.sh
-```
-
-Build the native macOS wrapper from the repository root after `npm run build`:
-
-```sh
-./macos/scripts/package.sh
-```
-
-For Word add-in code, run from `web`:
-
-```sh
-./node_modules/.bin/tsc -p word-addin/tsconfig.json
-./node_modules/.bin/vite build --config word-addin/vite.config.ts
 ```
 
 Describe what changed and what you checked.
